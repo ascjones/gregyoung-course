@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace StopLoss
@@ -67,10 +65,5 @@ namespace StopLoss
         }
 
         public const decimal StopLossThreshold = 0.1m;
-    }
-
-    public interface IMessageBus
-    {
-        void Publish(IMessage msg);
     }
 }
