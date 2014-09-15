@@ -22,11 +22,13 @@ namespace Restaurant.OrderHandlers
 
         public void HandleOrder(Order order)
         {
-            var subtotal = order.Items.Select(item =>
+            decimal subtotal = 0M;
+            foreach (var item in order.Items)
             {
                 var price = dishPrices[item.ItemName];
-                return price * item.Qty;
-            }).Sum();
+                item.Price = price;
+                subtotal += price * item.Qty;
+            }
 
             var tax = subtotal*TaxRate;
 
