@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using NUnit.Framework;
 
 namespace StopLoss.Tests
@@ -35,13 +31,16 @@ namespace StopLoss.Tests
         [Test]
         public void WhenPriceUpdatedWithinTenSecondsThenRaisesTwoSendInX()
         {
+            var positionAcquired = new PositionAcquired(1.0M);
+            stopLossManager.Consume(positionAcquired);
+
             var priceUpdated = new PriceUpdated {Price = 1.5M};
             stopLossManager.Consume(priceUpdated);
 
-            var events = bus.GetMessages();
+            var events = bus.GetMessages().OfType<SendToMeInX<PriceUpdated>>().ToArray();
             Assert.That(events, Has.Length.EqualTo(2));
-            var sendToMeInX1 = events.First() as SendToMeInX<PriceUpdated>;
-            var sendToMeInX2 = events.Last() as SendToMeInX<PriceUpdated>;
+            var sendToMeInX1 = events.First();
+            var sendToMeInX2 = events.Last();
 
 
             Assert.That(sendToMeInX1, Is.Not.Null);
@@ -129,6 +128,72 @@ namespace StopLoss.Tests
             var stopLossTriggered = bus.GetLastMessage<StopLossTriggered>();
 
             Assert.That(stopLossTriggered, Is.Not.Null);
+        }
+
+        [Test]
+        public void WhenPriceGoesDownAndIsNotSustainedForLongerThan7SecondsThenDoesntTriggerStopLoss()
+        {
+            var positionAcquired = new PositionAcquired(1.0M);
+            stopLossManager.Consume(positionAcquired);
+
+            var priceUpdated = new PriceUpdated { Price = 0.89M };
+            stopLossManager.Consume(priceUpdated);
+
+            var priceUpdated2 = new PriceUpdated { Price = 0.91M };
+            stopLossManager.Consume(priceUpdated2);
+
+            var sendToMeInX = new SendToMeInX<PriceUpdated>(7.0M, priceUpdated);
+            stopLossManager.Consume(sendToMeInX);
+
+            var stopLossTriggered = bus.GetLastMessage<StopLossTriggered>();
+
+            Assert.That(stopLossTriggered, Is.Null);
+        }
+
+
+        [Test]
+        public void WhenPriceUpdatedAfterThresholdThenTargetUpdatedWithNewPriceWithoutObsoletePricesAffectingIt()
+        {
+            var positionAcquired = new PositionAcquired(1.0M);
+            stopLossManager.Consume(positionAcquired);
+
+            var priceUpdated = new PriceUpdated { Price = 1.0M };
+            stopLossManager.Consume(priceUpdated);
+
+            var priceUpdated2 = new PriceUpdated { Price = 1.2M };
+            stopLossManager.Consume(priceUpdated2);
+
+            bus.Clear();
+
+            stopLossManager.Consume(new SendToMeInX<PriceUpdated>(10.0M, priceUpdated));
+            stopLossManager.Consume(new SendToMeInX<PriceUpdated>(10.0M, priceUpdated2));
+
+            var targetUpdated = bus.GetLastMessage<TargetUpdated>();
+
+            Assert.That(targetUpdated, Is.Not.Null);
+            Assert.That(targetUpdated.TargetPrice, Is.EqualTo(1.1M));
+        }
+
+        [Test]
+        public void AfterSellingDoesntSellAgain()
+        {
+            var positionAcquired = new PositionAcquired(1.0M);
+            stopLossManager.Consume(positionAcquired);
+
+            var priceUpdated = new PriceUpdated { Price = 0.89M };
+            stopLossManager.Consume(priceUpdated);
+
+            var priceUpdated2 = new PriceUpdated { Price = 0.5M };
+            stopLossManager.Consume(priceUpdated);
+
+            stopLossManager.Consume(new SendToMeInX<PriceUpdated>(7.0M, priceUpdated));
+
+            bus.Clear();
+            stopLossManager.Consume(new SendToMeInX<PriceUpdated>(7.0M, priceUpdated2));
+
+            var stopLossTriggered = bus.GetLastMessage<StopLossTriggered>();
+
+            Assert.That(stopLossTriggered, Is.Null);
         }
     }
 }
