@@ -5,12 +5,12 @@ namespace Restaurant
 {
     public class Waiter
     {
-        private readonly IHandleOrder _orderHandler;
+        private readonly IHandleOrder orderHandler;
         private int orderId = 1;
 
         public Waiter(IHandleOrder orderHandler)
         {
-            _orderHandler = orderHandler;
+            this.orderHandler = orderHandler;
         }
 
         public string PlaceOrder()
@@ -25,9 +25,10 @@ namespace Restaurant
                 {
                     new OrderItem {ItemName = "Spaghetti Bolognese", Qty = 2},
                     new OrderItem {ItemName = "Fish", Qty = 3 },
-                }
+                },
+                LiveUntil = DateTime.UtcNow.Add(TimeSpan.FromSeconds(10.0))
             };
-            _orderHandler.HandleOrder(order);
+            orderHandler.HandleOrder(order);
             return order.OrderId;
         } 
     }

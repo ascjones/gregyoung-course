@@ -15,12 +15,12 @@ namespace Playground
             var cashier = new Cashier(new ConsolePrintingOrderHandler());
             startables.Add(cashier);
             var assistantManager = new AssistantManager(cashier);
-
+          
             var chefs = new List<ThreadedHandler>();
             var rand = new Random();
             for (int i = 0; i < NumberOfChefs; i++)
             {
-                var chef = new Chef(assistantManager, rand.Next(1000));
+                var chef = new TimeToLiveDispatcher(new Chef(assistantManager, rand.Next(1000)));
                 var threaded = new ThreadedHandler(string.Format("Chef {0}", i) ,chef);
                 chefs.Add(threaded);
                 startables.Add(threaded);

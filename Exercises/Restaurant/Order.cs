@@ -1,9 +1,10 @@
+using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Restaurant
 {
-    public class Order
+    public class Order : IHaveTTL
     {
         public string OrderId { get; set; }
         public int TableNumber { get; set; }
@@ -63,5 +64,12 @@ namespace Restaurant
             order.Paid = jsonObject.GetValue("Paid").ToObject<bool>();
             return order;
         }
+
+        public DateTime LiveUntil { get; set; }
+    }
+
+    public interface IHaveTTL
+    {
+        DateTime LiveUntil { get; }
     }
 }
