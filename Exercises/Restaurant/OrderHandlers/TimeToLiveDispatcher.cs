@@ -13,7 +13,7 @@ namespace Restaurant.OrderHandlers
 
         public void Handle(T message)
         {
-            if (message.TimeToLive > DateTime.UtcNow)
+            if (!message.TimeToLive.HasValue || message.TimeToLive > DateTime.UtcNow)
             {
                 handler.Handle(message);
             }

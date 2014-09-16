@@ -28,7 +28,7 @@ namespace Playground
             for (int i = 0; i < NumberOfChefs; i++)
             {
                 var chef = new TimeToLiveDispatcher<OrderPlaced>(new Chef(bus, rand.Next(1000)));
-                var queuedHandler = new QueuedHandler<OrderPlaced>(bus, string.Format("Chef {0}", i), chef, true);
+                var queuedHandler = new QueuedHandler<OrderPlaced>(bus, string.Format("Chef {0}", i), chef, false);
                 chefs.Add(queuedHandler);
                 startables.Add(queuedHandler);
             }
