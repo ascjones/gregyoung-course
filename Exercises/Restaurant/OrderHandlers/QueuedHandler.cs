@@ -10,15 +10,11 @@ namespace Restaurant.OrderHandlers
         private readonly IHandle<T> handler;
         private readonly Thread workerThread;
 
-        public QueuedHandler(ITopicBasedPubSub bus, string name, IHandle<T> handler, bool doSubscribe = true)
+        public QueuedHandler(string name, IHandle<T> handler)
         {
             this.handler = handler;
 
             workerThread = new Thread(OrderHandler) { Name = name };
-            if (doSubscribe)
-            {
-                bus.Subscribe(this);
-            }
         }
 
         public decimal QueueCount { get { return workQueue.Count;  } }

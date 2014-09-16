@@ -13,14 +13,19 @@ namespace Playground
         {
             var bus = new TopicBasedPubSub();
             var startables = new List<IStartable>();
-            var consolePrinter = new QueuedHandler<OrderPaid>(bus, Messages.Paid, new ConsolePrintingOrderHandler(bus));
+
+            var consolePrinter = new QueuedHandler<OrderPaid>(Messages.Paid, new ConsolePrintingOrderHandler(bus));
+            bus.Subscribe(consolePrinter);
+
             startables.Add(consolePrinter);
             var cashier = new Cashier(bus);
-            var queuedCashier = new QueuedHandler<OrderPriced>(bus, Messages.OrderBilled, cashier);
+            var queuedCashier = new QueuedHandler<OrderPriced>(Messages.OrderBilled, cashier);
+            bus.Subscribe(queuedCashier);
             startables.Add(queuedCashier);
             startables.Add(cashier);
 
-            var assistantManager = new QueuedHandler<OrderCooked>(bus, Messages.OrderPrepared, new AssistantManager(bus));
+            var assistantManager = new QueuedHandler<OrderCooked>(Messages.OrderPrepared, new AssistantManager(bus));
+            bus.Subscribe(assistantManager);
             startables.Add(assistantManager);
           
             var chefs = new List<QueuedHandler<OrderPlaced>>();
@@ -28,7 +33,7 @@ namespace Playground
             for (int i = 0; i < NumberOfChefs; i++)
             {
                 var chef = new TimeToLiveDispatcher<OrderPlaced>(new Chef(bus, rand.Next(1000)));
-                var queuedHandler = new QueuedHandler<OrderPlaced>(bus, string.Format("Chef {0}", i), chef, false);
+                var queuedHandler = new QueuedHandler<OrderPlaced>(string.Format("Chef {0}", i), chef);
                 chefs.Add(queuedHandler);
                 startables.Add(queuedHandler);
             }
