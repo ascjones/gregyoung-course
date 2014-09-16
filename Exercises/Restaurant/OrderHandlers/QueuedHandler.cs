@@ -1,68 +1,54 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Restaurant.OrderHandlers
 {
-    public class QueuedHandler : IStartable, IHandleOrder
+    public interface IStartable
     {
-        private readonly ConcurrentQueue<Order>  outerQueue = new ConcurrentQueue<Order>();
-        private readonly IEnumerable<ThreadedHandler> childHandlers;
+        void Start();
+        string GetStatistics();
+    }
 
-        public QueuedHandler(IEnumerable<ThreadedHandler> childHandlers)
+    public class QueuedHandler : IHandleOrder, IStartable
+    {
+        private readonly ConcurrentQueue<Order> workQueue = new ConcurrentQueue<Order>();
+        private readonly IHandleOrder orderHandler;
+        private readonly Thread workerThread;
+
+        public QueuedHandler(string name, IHandleOrder orderHandler)
         {
-            this.childHandlers = childHandlers;
+            this.orderHandler = orderHandler;
+
+            workerThread = new Thread(OrderHandler) {Name = name};
         }
 
-        public void Start()
-        {
-            Task.Factory.StartNew(StartProcessingOrders, TaskCreationOptions.LongRunning);
-        }
+        public decimal QueueCount { get { return workQueue.Count;  } }
 
-        private void StartProcessingOrders()
+        private void OrderHandler()
         {
             while (true)
             {
                 Order order;
-                while (outerQueue.TryDequeue(out order))
-                {
-                    bool orderPending = true;
-                    while (orderPending)
-                    {
-                        foreach (var childHandler in childHandlers)
-                        {
-                            if (childHandler.QueueCount < 5)
-                            {
-                                try
-                                {
-                                    childHandler.HandleOrder(order);
-                                    orderPending = false;
-                                    break;
-                                }
-                                catch (Exception ex)
-                                {
-                                    // todo: deal wioth poison messages?
-                                    Console.WriteLine("Error handling order: {0}", ex);
-                                }
-                           }
-                        }
-                        Thread.Sleep(1);
-                    }
-                }
-                Thread.Sleep(1);
+                if (workQueue.TryDequeue(out order))
+                    orderHandler.HandleOrder(order);
+                else
+                    Thread.Sleep(1);
             }
-        }
-
-        public string GetStatistics()
-        {
-            return string.Format("Outer queue length: {0}", outerQueue.Count);
         }
 
         public void HandleOrder(Order order)
         {
-            outerQueue.Enqueue(order);
+            workQueue.Enqueue(order);
+        }
+
+        public void Start()
+        {
+            workerThread.Start();
+        }
+
+        public string GetStatistics()
+        {
+            return string.Format("{0} queue count {1}", workerThread.Name, workQueue.Count);
         }
     }
 }

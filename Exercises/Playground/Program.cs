@@ -16,17 +16,17 @@ namespace Playground
             startables.Add(cashier);
             var assistantManager = new AssistantManager(cashier);
           
-            var chefs = new List<ThreadedHandler>();
+            var chefs = new List<QueuedHandler>();
             var rand = new Random();
             for (int i = 0; i < NumberOfChefs; i++)
             {
                 var chef = new TimeToLiveDispatcher(new Chef(assistantManager, rand.Next(1000)));
-                var threaded = new ThreadedHandler(string.Format("Chef {0}", i) ,chef);
-                chefs.Add(threaded);
-                startables.Add(threaded);
+                var queuedHandler = new QueuedHandler(string.Format("Chef {0}", i) ,chef);
+                chefs.Add(queuedHandler);
+                startables.Add(queuedHandler);
             }
 
-            var distributionStrategy = new QueuedHandler(chefs);
+            var distributionStrategy = new QueuedDispatcher(chefs);
             startables.Add(distributionStrategy);
 
             foreach (var startable in startables)
