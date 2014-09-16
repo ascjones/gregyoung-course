@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Restaurant
 {
@@ -18,7 +14,8 @@ namespace Restaurant
 
         public void HandleOrder(Order order)
         {
-            orders.Add(order.OrderId, order);
+            if (!orders.ContainsKey(order.OrderId))
+                orders.Add(order.OrderId, order);
             _handler.HandleOrder(order);
         }
 

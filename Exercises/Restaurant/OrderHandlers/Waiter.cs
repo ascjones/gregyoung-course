@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Restaurant
 {
     public class Waiter
     {
         private readonly IHandleOrder _orderHandler;
+        private int orderId = 1;
 
         public Waiter(IHandleOrder orderHandler)
         {
@@ -15,7 +17,7 @@ namespace Restaurant
         {
             var order = new Order
             {
-                OrderId = "1",
+                OrderId = orderId++.ToString(CultureInfo.InvariantCulture),
                 TableNumber = 5,
                 ServerName = "Dave",
                 TimeStamp = DateTime.Now.ToShortTimeString(),
