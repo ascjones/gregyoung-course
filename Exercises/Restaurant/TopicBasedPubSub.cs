@@ -8,13 +8,14 @@ namespace Restaurant
 {
     public class TopicBasedPubSub : ITopicBasedPubSub
     {
-        private readonly IDictionary<Type, IMultiplexer> subscriptions = new ConcurrentDictionary<Type, IMultiplexer>(); 
+        private readonly IDictionary<string, IMultiplexer> subscriptions = new ConcurrentDictionary<string, IMultiplexer>(); 
 
-        public void Subscribe<T>(IHandle<T> handler)
+        public void Subscribe<T>(IHandle<T> handler, string topic = null)
         {
             Console.WriteLine("Subscribing to {0}", typeof(T).Name);
             IMultiplexer multiplexer;
-            var topic = typeof (T);
+
+            topic = topic ?? typeof (T).Name;
             if (!subscriptions.TryGetValue(topic, out multiplexer))
             {
                 multiplexer = new Multiplexer<T>(Enumerable.Empty<IHandle<T>>());
@@ -23,11 +24,12 @@ namespace Restaurant
             ((Multiplexer<T>) multiplexer).Add(handler);
         }
 
-        public void Publish<T>(T message)
+        public void Publish<T>(T message, string topic = null)
         {
             Console.WriteLine("Publishing to {0}", typeof(T).Name);
+            topic = topic ?? typeof(T).Name;
             IMultiplexer multiplexer;
-            if (subscriptions.TryGetValue(typeof (T), out multiplexer))
+            if (subscriptions.TryGetValue(topic, out multiplexer))
             {
                 var typedMultiplexer = (Multiplexer<T>)  multiplexer;
                 typedMultiplexer.Handle(message);
@@ -37,7 +39,7 @@ namespace Restaurant
 
     public interface ITopicBasedPubSub
     {
-        void Subscribe<T>(IHandle<T> handler);
-        void Publish<T>(T message);
+        void Subscribe<T>(IHandle<T> handler, string topic = null);
+        void Publish<T>(T message, string topic = null);
     }
 }
