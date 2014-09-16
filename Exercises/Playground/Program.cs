@@ -26,8 +26,8 @@ namespace Playground
                 startables.Add(threaded);
             }
 
-            //   var multiplexer = new Multiplexer(chefs);
-            var roundRobin = new RoundRobin(chefs);
+            var distributionStrategy = new QueuedHandler(chefs);
+            startables.Add(distributionStrategy);
 
             foreach (var startable in startables)
             {
@@ -36,7 +36,7 @@ namespace Playground
             var monitor = new Monitor(startables);
             monitor.Start();
 
-            var waiter = new Waiter(roundRobin);
+            var waiter = new Waiter(distributionStrategy);
 
             for (int i = 0; i < 1000; i++)
             {

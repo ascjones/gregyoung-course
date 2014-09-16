@@ -48,6 +48,7 @@
     <Compile Include="OrderHandlers\IHandleOrder.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="OrderHandlers\Multiplexer.cs" />
+    <Compile Include="OrderHandlers\QueuedHandler.cs" />
     <Compile Include="OrderHandlers\RoundRobin.cs" />
     <Compile Include="OrderHandlers\ThreadedHandler.cs" />
     <Compile Include="OrderItem.cs" />

@@ -22,6 +22,8 @@ namespace Restaurant.OrderHandlers
             workerThread = new Thread(OrderHandler) {Name = name};
         }
 
+        public decimal QueueCount { get { return workQueue.Count;  } }
+
         private void OrderHandler()
         {
             while (true)
