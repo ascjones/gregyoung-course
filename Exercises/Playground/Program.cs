@@ -17,11 +17,11 @@ namespace Playground
             var assistantManager = new AssistantManager(cashier);
 
             var chefs = new List<ThreadedHandler>();
-
+            var rand = new Random();
             for (int i = 0; i < NumberOfChefs; i++)
             {
-                var chef = new Chef(assistantManager);
-                var threaded = new ThreadedHandler(chef);
+                var chef = new Chef(assistantManager, rand.Next(1000));
+                var threaded = new ThreadedHandler(string.Format("Chef {0}", i) ,chef);
                 chefs.Add(threaded);
                 startables.Add(threaded);
             }
@@ -38,7 +38,10 @@ namespace Playground
 
             var waiter = new Waiter(roundRobin);
 
-            var orderId = waiter.PlaceOrder();
+            for (int i = 0; i < 1000; i++)
+            {
+                var orderId = waiter.PlaceOrder();    
+            }            
 
             Console.ReadKey();
         }

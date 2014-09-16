@@ -10,10 +10,12 @@ namespace Restaurant
     public class Chef : IHandleOrder
     {
         private readonly IHandleOrder _orderHandler;
+        private readonly int timeToCook;
 
-        public Chef(IHandleOrder orderHandler)
+        public Chef(IHandleOrder orderHandler, int timeToCook)
         {
             _orderHandler = orderHandler;
+            this.timeToCook = timeToCook;
         }
 
         private readonly IDictionary<string, string> ingredientDb = new Dictionary<string, string>()
@@ -24,7 +26,7 @@ namespace Restaurant
 
         public void HandleOrder(Order order)
         {
-            Thread.Sleep(1000);
+            Thread.Sleep(timeToCook);
 
             order.Ingredients = order.Items.Select(i => ingredientDb[i.ItemName]).ToArray();
 

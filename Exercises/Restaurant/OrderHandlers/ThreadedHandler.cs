@@ -15,11 +15,11 @@ namespace Restaurant.OrderHandlers
         private readonly IHandleOrder orderHandler;
         private readonly Thread workerThread;
 
-        public ThreadedHandler(IHandleOrder orderHandler)
+        public ThreadedHandler(string name, IHandleOrder orderHandler)
         {
             this.orderHandler = orderHandler;
 
-            workerThread = new Thread(OrderHandler);
+            workerThread = new Thread(OrderHandler) {Name = name};
         }
 
         private void OrderHandler()
@@ -46,7 +46,7 @@ namespace Restaurant.OrderHandlers
 
         public string GetStatistics()
         {
-            return string.Format("{0} queue count {1}", orderHandler.GetType().Name, workQueue.Count);
+            return string.Format("{0} queue count {1}", workerThread.Name, workQueue.Count);
         }
     }
 }

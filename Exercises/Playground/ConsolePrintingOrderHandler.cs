@@ -7,7 +7,7 @@ namespace Playground
     {
         public void HandleOrder(Order order)
         {
-            Console.WriteLine(order.Serialize().ToString());
+            //Console.WriteLine(order.Serialize().ToString());
         }
     }
 }
