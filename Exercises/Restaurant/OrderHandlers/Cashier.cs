@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Restaurant
+namespace Restaurant.OrderHandlers
 {
-    public class Cashier : IHandleOrder
+    public class Cashier : IHandleOrder, IStartable
     {
         private readonly IHandleOrder handler;
         private readonly ConcurrentQueue<Order> orders = new ConcurrentQueue<Order>();
@@ -36,6 +36,11 @@ namespace Restaurant
         public void Start()
         {
             Task.Factory.StartNew(HandleOutstandingPayments, TaskCreationOptions.LongRunning);
+        }
+
+        public string GetStatistics()
+        {
+            return string.Format("Cashier queue count {0}", orders.Count);
         }
     }
 }

@@ -6,6 +6,7 @@ namespace Restaurant.OrderHandlers
     public interface IStartable
     {
         void Start();
+        string GetStatistics();
     }
 
     public class ThreadedHandler : IHandleOrder, IStartable
@@ -41,6 +42,11 @@ namespace Restaurant.OrderHandlers
         public void Start()
         {
             workerThread.Start();
+        }
+
+        public string GetStatistics()
+        {
+            return string.Format("{0} queue count {1}", orderHandler.GetType().Name, workQueue.Count);
         }
     }
 }
