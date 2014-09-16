@@ -28,7 +28,7 @@ namespace Restaurant
                 },
                 LiveUntil = DateTime.UtcNow.Add(TimeSpan.FromSeconds(10.0))
             };
-            bus.Publish(Messages.OrderPlaced, order);
+            bus.Publish(new OrderPlaced(order));
             return order.OrderId;
         } 
     }

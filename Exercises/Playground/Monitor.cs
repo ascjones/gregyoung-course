@@ -24,7 +24,7 @@ namespace Playground
                     foreach (var monitorable in monitorables)
                     {
                         string message = monitorable.GetStatistics();
-                        Console.WriteLine(message);
+                        //Console.WriteLine(message);
                     }
                     Thread.Sleep(1000);
                 }

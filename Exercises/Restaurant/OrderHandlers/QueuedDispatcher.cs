@@ -6,16 +6,14 @@ using System.Threading.Tasks;
 
 namespace Restaurant.OrderHandlers
 {
-    public class QueuedDispatcher : IStartable, IHandleOrder
+    public class QueuedDispatcher<T> : IStartable, IHandle<T>
     {
-        private readonly ConcurrentQueue<Order>  outerQueue = new ConcurrentQueue<Order>();
-        private readonly ITopicBasedPubSub bus;
-        private readonly IEnumerable<QueuedHandler> childHandlers;
+        private readonly ConcurrentQueue<T>  outerQueue = new ConcurrentQueue<T>();
+        private readonly IEnumerable<QueuedHandler<T>> childHandlers;
 
-        public QueuedDispatcher(ITopicBasedPubSub bus, IEnumerable<QueuedHandler> childHandlers)
+        public QueuedDispatcher(ITopicBasedPubSub bus, IEnumerable<QueuedHandler<T>> childHandlers)
         {
-            this.bus = bus;
-            bus.Subscribe(Messages.OrderPlaced, this);
+            bus.Subscribe(this);
             this.childHandlers = childHandlers;
         }
 
@@ -28,11 +26,11 @@ namespace Restaurant.OrderHandlers
         {
             while (true)
             {
-                Order order;
-                while (outerQueue.TryDequeue(out order))
+                T message;
+                while (outerQueue.TryDequeue(out message))
                 {
-                    bool orderPending = true;
-                    while (orderPending)
+                    bool pending = true;
+                    while (pending)
                     {
                         foreach (var childHandler in childHandlers)
                         {
@@ -40,8 +38,8 @@ namespace Restaurant.OrderHandlers
                             {
                                 try
                                 {
-                                    childHandler.HandleOrder(order);
-                                    orderPending = false;
+                                    childHandler.Handle(message);
+                                    pending = false;
                                     break;
                                 }
                                 catch (Exception ex)
@@ -63,9 +61,9 @@ namespace Restaurant.OrderHandlers
             return string.Format("Outer queue length: {0}", outerQueue.Count);
         }
 
-        public void HandleOrder(Order order)
+        public void Handle(T message)
         {
-            outerQueue.Enqueue(order);
+            outerQueue.Enqueue(message);
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Restaurant.OrderHandlers
 {
-    public class Cashier : IHandleOrder, IStartable
+    public class Cashier : IHandle<OrderPriced>, IStartable
     {
         private readonly ITopicBasedPubSub bus;
         private readonly ConcurrentQueue<Order> orders = new ConcurrentQueue<Order>();
@@ -14,9 +14,9 @@ namespace Restaurant.OrderHandlers
             this.bus = bus;
         }
 
-        public void HandleOrder(Order order)
+        public void Handle(OrderPriced message)
         {
-            orders.Enqueue(order);
+            orders.Enqueue(message.Order);
         }
 
         public void HandleOutstandingPayments()
@@ -27,7 +27,7 @@ namespace Restaurant.OrderHandlers
                 while (orders.TryDequeue(out order))
                 {
                     order.Paid = true;
-                    bus.Publish(Messages.Paid, order);
+                    bus.Publish(new OrderPaid(order));
                 }
                 Thread.Sleep(1);
             }       
@@ -42,5 +42,7 @@ namespace Restaurant.OrderHandlers
         {
             return string.Format("Cashier queue count {0}", orders.Count);
         }
+
+        
     }
 }

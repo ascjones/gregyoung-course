@@ -4,22 +4,20 @@ using System.Threading;
 
 namespace Restaurant.OrderHandlers
 {
-    public class QueuedHandler : IHandleOrder, IStartable
+    public class QueuedHandler<T> : IHandle<T>, IStartable
     {
-        private readonly ConcurrentQueue<Order> workQueue = new ConcurrentQueue<Order>();
-        private readonly ITopicBasedPubSub bus;
-        private readonly IHandleOrder orderHandler;
+        private readonly ConcurrentQueue<T> workQueue = new ConcurrentQueue<T>();
+        private readonly IHandle<T> handler;
         private readonly Thread workerThread;
 
-        public QueuedHandler(ITopicBasedPubSub bus, string name, IHandleOrder orderHandler, bool doSubscribe = true)
+        public QueuedHandler(ITopicBasedPubSub bus, string name, IHandle<T> handler, bool doSubscribe = true)
         {
-            this.bus = bus;
-            this.orderHandler = orderHandler;
+            this.handler = handler;
 
             workerThread = new Thread(OrderHandler) { Name = name };
             if (doSubscribe)
             {
-                bus.Subscribe(name, this);
+                bus.Subscribe(this);
             }
         }
 
@@ -29,18 +27,17 @@ namespace Restaurant.OrderHandlers
         {
             while (true)
             {
-                Order order;
-                if (workQueue.TryDequeue(out order))
-                    orderHandler.HandleOrder(order);
+                T message;
+                if (workQueue.TryDequeue(out message))
+                    handler.Handle(message);
                 else
                     Thread.Sleep(1);
             }
         }
 
-        public void HandleOrder(Order order)
+        public void Handle(T message)
         {
-          //  Console.WriteLine("Queued Handler received and enqueued Order for type {0}", orderHandler.GetType().Name);
-            workQueue.Enqueue(order);
+            workQueue.Enqueue(message);
         }
 
         public void Start()
@@ -51,6 +48,6 @@ namespace Restaurant.OrderHandlers
         public string GetStatistics()
         {
             return string.Format("{0} queue count {1}", workerThread.Name, workQueue.Count);
-        }
+        }       
     }
 }

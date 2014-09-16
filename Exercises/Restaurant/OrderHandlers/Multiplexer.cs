@@ -3,26 +3,30 @@ using System.Collections.Generic;
 
 namespace Restaurant.OrderHandlers
 {
-    public class Multiplexer : IHandleOrder
+    public interface IMultiplexer
     {
-        private readonly IList<IHandleOrder> orderHandlers;
+    }
 
-        public Multiplexer(IEnumerable<IHandleOrder> orderHandlers)
+    public class Multiplexer<T> : IHandle<T>, IMultiplexer
+    {
+        private readonly IList<IHandle<T>> handlers;
+
+        public Multiplexer(IEnumerable<IHandle<T>> handlers)
         {
-            this.orderHandlers = new List<IHandleOrder>(orderHandlers);
+            this.handlers = new List<IHandle<T>>(handlers);
         }
 
-        public void Add(IHandleOrder handler)
+        public void Add(IHandle<T> handler)
         {
-            orderHandlers.Add(handler);
+            handlers.Add(handler);
         }
 
-        public void HandleOrder(Order order)
+        public void Handle(T msg)
         {
-            foreach (var handler in orderHandlers)
+            foreach (var handler in handlers)
             {
-            //    Console.WriteLine("Multiplexer delivering to {0}", handler.GetType().Name);
-                handler.HandleOrder(order);
+                Console.WriteLine("Multiplexer delivering to {0}:{1}", handler.GetType().Name, typeof(T).Name);
+                handler.Handle(msg);
             }
         }
     }

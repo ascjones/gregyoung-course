@@ -42,10 +42,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events.cs" />
     <Compile Include="OrderHandlers\Cashier.cs" />
     <Compile Include="OrderHandlers\AssistantManager.cs" />
     <Compile Include="OrderHandlers\Chef.cs" />
-    <Compile Include="OrderHandlers\IHandleOrder.cs" />
+    <Compile Include="OrderHandlers\IHandle.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="OrderHandlers\IStartable.cs" />
     <Compile Include="OrderHandlers\Messages.cs" />

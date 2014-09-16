@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace Restaurant.OrderHandlers
 {
-    public class AssistantManager : IHandleOrder
+    public class AssistantManager : IHandle<OrderCooked>
     {
         private readonly ITopicBasedPubSub bus;
         private const decimal TaxRate = 0.2M;
@@ -17,11 +16,11 @@ namespace Restaurant.OrderHandlers
         public AssistantManager(ITopicBasedPubSub bus)
         {
             this.bus = bus;
-            bus.Subscribe(Messages.OrderPrepared, this);
         }
 
-        public void HandleOrder(Order order)
+        public void Handle(OrderCooked message)
         {
+            var order = message.Order;
             decimal subtotal = 0M;
             foreach (var item in order.Items)
             {
@@ -30,13 +29,13 @@ namespace Restaurant.OrderHandlers
                 subtotal += price * item.Qty;
             }
 
-            var tax = subtotal*TaxRate;
+            var tax = subtotal * TaxRate;
 
             order.Subtotal = subtotal;
             order.Tax = tax;
             order.Total = subtotal + tax;
 
-            bus.Publish(Messages.OrderBilled, order);
+            bus.Publish(new OrderPlaced(order));
         }
     }
 }

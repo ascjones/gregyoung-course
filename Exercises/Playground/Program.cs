@@ -13,27 +13,27 @@ namespace Playground
         {
             var bus = new TopicBasedPubSub();
             var startables = new List<IStartable>();
-            var consolePrinter = new QueuedHandler(bus, Messages.Paid, new ConsolePrintingOrderHandler(bus));
+            var consolePrinter = new QueuedHandler<OrderPaid>(bus, Messages.Paid, new ConsolePrintingOrderHandler(bus));
             startables.Add(consolePrinter);
             var cashier = new Cashier(bus);
-            var queuedCashier = new QueuedHandler(bus, Messages.OrderBilled, cashier);
+            var queuedCashier = new QueuedHandler<OrderPriced>(bus, Messages.OrderBilled, cashier);
             startables.Add(queuedCashier);
             startables.Add(cashier);
 
-            var assistantManager = new QueuedHandler(bus, Messages.OrderPrepared, new AssistantManager(bus));
+            var assistantManager = new QueuedHandler<OrderCooked>(bus, Messages.OrderPrepared, new AssistantManager(bus));
             startables.Add(assistantManager);
           
-            var chefs = new List<QueuedHandler>();
+            var chefs = new List<QueuedHandler<OrderPlaced>>();
             var rand = new Random();
             for (int i = 0; i < NumberOfChefs; i++)
             {
-                var chef = new TimeToLiveDispatcher(new Chef(bus, rand.Next(1000)));
-                var queuedHandler = new QueuedHandler(bus, string.Format("Chef {0}", i), chef, false);
+                var chef = new TimeToLiveDispatcher<OrderPlaced>(new Chef(bus, rand.Next(1000)));
+                var queuedHandler = new QueuedHandler<OrderPlaced>(bus, string.Format("Chef {0}", i), chef, true);
                 chefs.Add(queuedHandler);
                 startables.Add(queuedHandler);
             }
 
-            var distributionStrategy = new QueuedDispatcher(bus, chefs);
+            var distributionStrategy = new QueuedDispatcher<OrderPlaced>(bus, chefs);
             startables.Add(distributionStrategy);
 
             foreach (var startable in startables)
@@ -45,7 +45,7 @@ namespace Playground
 
             var waiter = new Waiter(bus);
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 1; i++)
             {
                 var orderId = waiter.PlaceOrder();    
             }            

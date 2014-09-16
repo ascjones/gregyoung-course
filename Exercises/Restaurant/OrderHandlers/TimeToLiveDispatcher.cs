@@ -2,24 +2,24 @@
 
 namespace Restaurant.OrderHandlers
 {
-    public class TimeToLiveDispatcher : IHandleOrder
+    public class TimeToLiveDispatcher<T> : IHandle<T> where T : IMessage
     {
-        private readonly IHandleOrder orderHandler;
+        private readonly IHandle<T> handler;
 
-        public TimeToLiveDispatcher(IHandleOrder orderHandler)
+        public TimeToLiveDispatcher(IHandle<T> handler)
         {
-            this.orderHandler = orderHandler;
+            this.handler = handler;
         }
 
-        public void HandleOrder(Order order)
+        public void Handle(T message)
         {
-            if (order.LiveUntil > DateTime.UtcNow)
+            if (message.TimeToLive > DateTime.UtcNow)
             {
-                orderHandler.HandleOrder(order);
+                handler.Handle(message);
             }
             else
             {
-                Console.WriteLine("Message past TTL, discarding. {0}", order.OrderId);
+                Console.WriteLine("Message past TTL, discarding. {0}", message.MessageId);
             }
         }
     }

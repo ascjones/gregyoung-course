@@ -1,9 +1,10 @@
 ﻿using System;
 using Restaurant;
+using Restaurant.OrderHandlers;
 
 namespace Playground
 {
-    class ConsolePrintingOrderHandler : IHandleOrder
+    class ConsolePrintingOrderHandler : IHandle<OrderPaid>
     {
         private readonly ITopicBasedPubSub bus;
 
@@ -12,9 +13,9 @@ namespace Playground
             this.bus = bus;
         }
 
-        public void HandleOrder(Order order)
+        public void Handle(OrderPaid message)
         {
-        //    Console.WriteLine(order.Serialize().ToString());
+            Console.WriteLine(message.Order.Serialize().ToString());
         }
     }
 }

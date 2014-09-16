@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Restaurant.OrderHandlers;
 
 namespace Restaurant
 {
-    public class Chef : IHandleOrder
+    public class Chef : IHandle<OrderPlaced>
     {
         private readonly ITopicBasedPubSub bus;
         private readonly int timeToCook;
@@ -24,14 +25,13 @@ namespace Restaurant
             {"Fish", "Cod, Chips, Mushy Peas"},
         };
 
-        public void HandleOrder(Order order)
+        public void Handle(OrderPlaced message)
         {
             Thread.Sleep(timeToCook);
-
+            var order = message.Order;
             order.Ingredients = order.Items.Select(i => ingredientDb[i.ItemName]).ToArray();
 
-            bus.Publish(Messages.OrderPrepared, order);
-
+            bus.Publish(new OrderCooked(order));
         }
     }
 }

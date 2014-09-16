@@ -2,27 +2,27 @@
 
 namespace Restaurant.OrderHandlers
 {
-    public class RoundRobin : IHandleOrder
-    {
-        private readonly Queue<IHandleOrder> handlers;
+    //public class RoundRobin : IHandle<T>
+    //{
+    //    private readonly Queue<IHandle<T>> handlers;
 
-        public RoundRobin(IEnumerable<IHandleOrder> handlers)
-        {
-            this.handlers = new Queue<IHandleOrder>(handlers);
-        }
+    //    public RoundRobin(IEnumerable<IHandle<T> handlers)
+    //    {
+    //        this.handlers = new Queue<IHandle>(handlers);
+    //    }
 
-        public void HandleOrder(Order order)
-        {
-            var handler = handlers.Dequeue();
+    //    public void HandleOrder(Order order)
+    //    {
+    //        var handler = handlers.Dequeue();
 
-            try
-            {
-                handler.HandleOrder(order);
-            }
-            finally 
-            {
-                handlers.Enqueue(handler);
-            }
-        }
-    }
+    //        try
+    //        {
+    //            handler.Handle(order);
+    //        }
+    //        finally 
+    //        {
+    //            handlers.Enqueue(handler);
+    //        }
+    //    }
+    //}
 }
