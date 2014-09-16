@@ -9,10 +9,13 @@ namespace Restaurant.OrderHandlers
     public class QueuedDispatcher : IStartable, IHandleOrder
     {
         private readonly ConcurrentQueue<Order>  outerQueue = new ConcurrentQueue<Order>();
+        private readonly ITopicBasedPubSub bus;
         private readonly IEnumerable<QueuedHandler> childHandlers;
 
-        public QueuedDispatcher(IEnumerable<QueuedHandler> childHandlers)
+        public QueuedDispatcher(ITopicBasedPubSub bus, IEnumerable<QueuedHandler> childHandlers)
         {
+            this.bus = bus;
+            bus.Subscribe(Messages.OrderPlaced, this);
             this.childHandlers = childHandlers;
         }
 

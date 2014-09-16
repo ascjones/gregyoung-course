@@ -5,12 +5,12 @@ namespace Restaurant
 {
     public class Waiter
     {
-        private readonly IHandleOrder orderHandler;
+        private readonly ITopicBasedPubSub bus;
         private int orderId = 1;
 
-        public Waiter(IHandleOrder orderHandler)
+        public Waiter(ITopicBasedPubSub bus)
         {
-            this.orderHandler = orderHandler;
+            this.bus = bus;
         }
 
         public string PlaceOrder()
@@ -28,7 +28,7 @@ namespace Restaurant
                 },
                 LiveUntil = DateTime.UtcNow.Add(TimeSpan.FromSeconds(10.0))
             };
-            orderHandler.HandleOrder(order);
+            bus.Publish(Messages.OrderPlaced, order);
             return order.OrderId;
         } 
     }

@@ -6,12 +6,12 @@ namespace Restaurant.OrderHandlers
 {
     public class Cashier : IHandleOrder, IStartable
     {
-        private readonly IHandleOrder handler;
+        private readonly ITopicBasedPubSub bus;
         private readonly ConcurrentQueue<Order> orders = new ConcurrentQueue<Order>();
 
-        public Cashier(IHandleOrder handler)
+        public Cashier(ITopicBasedPubSub bus)
         {
-            this.handler = handler;
+            this.bus = bus;
         }
 
         public void HandleOrder(Order order)
@@ -27,7 +27,7 @@ namespace Restaurant.OrderHandlers
                 while (orders.TryDequeue(out order))
                 {
                     order.Paid = true;
-                    handler.HandleOrder(order);
+                    bus.Publish(Messages.Paid, order);
                 }
                 Thread.Sleep(1);
             }       

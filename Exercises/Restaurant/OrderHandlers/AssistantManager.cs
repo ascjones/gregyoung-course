@@ -5,19 +5,19 @@ namespace Restaurant.OrderHandlers
 {
     public class AssistantManager : IHandleOrder
     {
-        private readonly IHandleOrder orderHandler;
-
+        private readonly ITopicBasedPubSub bus;
         private const decimal TaxRate = 0.2M;
 
-        private Dictionary<string, decimal> dishPrices = new Dictionary<string, decimal>
+        private readonly Dictionary<string, decimal> dishPrices = new Dictionary<string, decimal>
         {
             { "Spaghetti Bolognese", 27.90M },
             { "Fish", 23.90M }
         }; 
 
-        public AssistantManager(IHandleOrder orderHandler)
+        public AssistantManager(ITopicBasedPubSub bus)
         {
-            this.orderHandler = orderHandler;
+            this.bus = bus;
+            bus.Subscribe(Messages.OrderPrepared, this);
         }
 
         public void HandleOrder(Order order)
@@ -36,7 +36,7 @@ namespace Restaurant.OrderHandlers
             order.Tax = tax;
             order.Total = subtotal + tax;
 
-            orderHandler.HandleOrder(order);
+            bus.Publish(Messages.OrderBilled, order);
         }
     }
 }

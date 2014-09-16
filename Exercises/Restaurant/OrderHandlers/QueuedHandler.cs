@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Threading;
 
 namespace Restaurant.OrderHandlers
@@ -6,14 +7,20 @@ namespace Restaurant.OrderHandlers
     public class QueuedHandler : IHandleOrder, IStartable
     {
         private readonly ConcurrentQueue<Order> workQueue = new ConcurrentQueue<Order>();
+        private readonly ITopicBasedPubSub bus;
         private readonly IHandleOrder orderHandler;
         private readonly Thread workerThread;
 
-        public QueuedHandler(string name, IHandleOrder orderHandler)
+        public QueuedHandler(ITopicBasedPubSub bus, string name, IHandleOrder orderHandler, bool doSubscribe = true)
         {
+            this.bus = bus;
             this.orderHandler = orderHandler;
 
-            workerThread = new Thread(OrderHandler) {Name = name};
+            workerThread = new Thread(OrderHandler) { Name = name };
+            if (doSubscribe)
+            {
+                bus.Subscribe(name, this);
+            }
         }
 
         public decimal QueueCount { get { return workQueue.Count;  } }
@@ -32,6 +39,7 @@ namespace Restaurant.OrderHandlers
 
         public void HandleOrder(Order order)
         {
+          //  Console.WriteLine("Queued Handler received and enqueued Order for type {0}", orderHandler.GetType().Name);
             workQueue.Enqueue(order);
         }
 

@@ -9,12 +9,12 @@ namespace Restaurant
 {
     public class Chef : IHandleOrder
     {
-        private readonly IHandleOrder _orderHandler;
+        private readonly ITopicBasedPubSub bus;
         private readonly int timeToCook;
 
-        public Chef(IHandleOrder orderHandler, int timeToCook)
+        public Chef(ITopicBasedPubSub bus, int timeToCook)
         {
-            _orderHandler = orderHandler;
+            this.bus = bus;
             this.timeToCook = timeToCook;
         }
 
@@ -30,7 +30,8 @@ namespace Restaurant
 
             order.Ingredients = order.Items.Select(i => ingredientDb[i.ItemName]).ToArray();
 
-            _orderHandler.HandleOrder(order);
+            bus.Publish(Messages.OrderPrepared, order);
+
         }
     }
 }
