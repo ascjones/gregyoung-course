@@ -9,9 +9,9 @@ namespace Restaurant.OrderHandlers
     public class QueuedDispatcher : IStartable, IHandleOrder
     {
         private readonly ConcurrentQueue<Order>  outerQueue = new ConcurrentQueue<Order>();
-        private readonly IEnumerable<ThreadedHandler> childHandlers;
+        private readonly IEnumerable<QueuedHandler> childHandlers;
 
-        public QueuedDispatcher(IEnumerable<ThreadedHandler> childHandlers)
+        public QueuedDispatcher(IEnumerable<QueuedHandler> childHandlers)
         {
             this.childHandlers = childHandlers;
         }

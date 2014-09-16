@@ -3,12 +3,6 @@ using System.Threading;
 
 namespace Restaurant.OrderHandlers
 {
-    public interface IStartable
-    {
-        void Start();
-        string GetStatistics();
-    }
-
     public class QueuedHandler : IHandleOrder, IStartable
     {
         private readonly ConcurrentQueue<Order> workQueue = new ConcurrentQueue<Order>();

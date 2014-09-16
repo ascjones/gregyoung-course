@@ -47,10 +47,11 @@
     <Compile Include="OrderHandlers\Chef.cs" />
     <Compile Include="OrderHandlers\IHandleOrder.cs" />
     <Compile Include="Order.cs" />
+    <Compile Include="OrderHandlers\IStartable.cs" />
     <Compile Include="OrderHandlers\Multiplexer.cs" />
-    <Compile Include="OrderHandlers\QueuedHandler.cs" />
+    <Compile Include="OrderHandlers\QueuedDispatcher.cs" />
     <Compile Include="OrderHandlers\RoundRobin.cs" />
-    <Compile Include="OrderHandlers\ThreadedHandler.cs" />
+    <Compile Include="OrderHandlers\QueuedHandler.cs" />
     <Compile Include="OrderHandlers\TimeToLiveDispatcher.cs" />
     <Compile Include="OrderItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
