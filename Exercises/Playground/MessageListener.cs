@@ -12,7 +12,7 @@ namespace Playground
     {
         public MessageListener(ITopicBasedPubSub bus)
         {
-            bus.Subscribe<IMessage>(this);
+//            bus.Subscribe<IMessage>(this);
         }
 
         public void Handle(IMessage message)

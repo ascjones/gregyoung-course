@@ -13,7 +13,7 @@ namespace Restaurant.OrderHandlers
             this.bus = bus;
         }
 
-        public string PlaceOrder()
+        public string PlaceOrder(Guid correlationId)
         {
             DateTime liveUntil = DateTime.UtcNow.Add(TimeSpan.FromSeconds(10.0));
             var order = new Order
@@ -29,7 +29,8 @@ namespace Restaurant.OrderHandlers
                 },
                 LiveUntil = liveUntil
             };
-            bus.Publish(new CookFood(order, Guid.Empty, Guid.NewGuid(), liveUntil));
+
+            bus.Publish(new CookFood(order, Guid.Empty, correlationId, liveUntil));
             return order.OrderId;
         } 
     }

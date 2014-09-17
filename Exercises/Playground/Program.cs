@@ -52,9 +52,13 @@ namespace Playground
 
             var waiter = new Waiter(bus);
 
+            var correlationId = Guid.NewGuid();
+
+            bus.SusbcribeOnCorrelationId(messageListener, correlationId);
+
             for (int i = 0; i < 1; i++)
             {
-                var orderId = waiter.PlaceOrder();    
+                var orderId = waiter.PlaceOrder(correlationId);    
             }            
 
             Console.ReadKey();

@@ -23,6 +23,16 @@ namespace Restaurant
             ((Multiplexer) multiplexer).Add(handler);
         }
 
+        public void SusbcribeOnCorrelationId(IHandle<IMessage> handler, Guid correlationId)
+        {
+            Subscribe(handler, correlationId.ToString());
+        }
+
+        public void Unsubscribe(IHandle<IMessage> handler, Guid correlationId)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Publish<T>(T message, string topic = null)
             where T : IMessage
         {
@@ -41,12 +51,23 @@ namespace Restaurant
                 var typedMultiplexer = (Multiplexer) messageMultiplexer;
                 typedMultiplexer.Handle(message);
             }
+
+            // publish to subscribers subscribed on correlationId
+            IMultiplexer correlationIdMultiplexer;
+            if (subscriptions.TryGetValue(message.CorrelationId.ToString(), out correlationIdMultiplexer))
+            {
+                var typedMultiplexer = (Multiplexer) correlationIdMultiplexer;
+                typedMultiplexer.Handle(message);
+            }
         }
     }
 
     public interface ITopicBasedPubSub
     {
         void Subscribe<T>(IHandle<T> handler, string topic = null) where T : IMessage;
+        void SusbcribeOnCorrelationId(IHandle<IMessage> handler, Guid correlationId);
+        void Unsubscribe(IHandle<IMessage> handler, Guid correlationId);
+
         void Publish<T>(T message, string topic = null) where T : IMessage;
     }
 }
