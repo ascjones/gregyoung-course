@@ -4,7 +4,7 @@ using Restaurant.OrderHandlers;
 
 namespace Restaurant
 {
-    public class MidgetHouse : IHandle<OrderPlaced>
+    public class MidgetHouse : IHandle<OrderPlaced>, IHandle<OrderCooked>, IHandle<OrderPriced>
     {
         private readonly ITopicBasedPubSub bus;
         private IDictionary<Guid, Midget> midgets = new Dictionary<Guid, Midget>();
@@ -12,7 +12,11 @@ namespace Restaurant
         public MidgetHouse(ITopicBasedPubSub bus)
         {
             this.bus = bus;
-            bus.Subscribe(this);
+
+            // todo: could wire this up using reflection
+            bus.Subscribe<OrderPlaced>(this);
+            bus.Subscribe<OrderCooked>(this);
+            bus.Subscribe<OrderPriced>(this);
         }
 
         public void AddMidget(Midget midget)
@@ -21,6 +25,16 @@ namespace Restaurant
         }
 
         public void Handle(OrderPlaced message)
+        {
+            midgets[message.CorrelationId].Handle(message);
+        }
+
+        public void Handle(OrderCooked message)
+        {
+            midgets[message.CorrelationId].Handle(message);
+        }
+
+        public void Handle(OrderPriced message)
         {
             midgets[message.CorrelationId].Handle(message);
         }
@@ -54,6 +68,16 @@ namespace Restaurant
         public void Handle(OrderPlaced message)
         {
             bus.Publish(new CookFood(message.Order, message.MessageId, message.CorrelationId, DateTime.UtcNow.AddSeconds(10)));
+        }
+
+        public void Handle(OrderCooked message)
+        {
+            bus.Publish(new PriceOrder(message.Order, message.MessageId, message.CorrelationId));
+        }
+
+        public void Handle(OrderPriced message)
+        {
+            bus.Publish(new TakePayment(message.Order, message.MessageId, message.CorrelationId));
         }
     }
 
