@@ -62,12 +62,15 @@ namespace Restaurant
         }
     }
 
-    public interface ITopicBasedPubSub
+    public interface IMessagePublisher
+    {
+        void Publish<T>(T message, string topic = null) where T : IMessage;
+    }
+
+    public interface ITopicBasedPubSub : IMessagePublisher
     {
         void Subscribe<T>(IHandle<T> handler, string topic = null) where T : IMessage;
         void SusbcribeOnCorrelationId(IHandle<IMessage> handler, Guid correlationId);
         void Unsubscribe(IHandle<IMessage> handler, Guid correlationId);
-
-        void Publish<T>(T message, string topic = null) where T : IMessage;
     }
 }
