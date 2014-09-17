@@ -29,7 +29,7 @@ namespace Restaurant.OrderHandlers
             existingHandlers.Add(handler);
         }
 
-        public void Handle<T>(T msg)
+        public void Handle<T>(T msg) where T : IMessage
         {
             List<IHandler> messageHandlers;
             if (handlers.TryGetValue(typeof(T), out messageHandlers))
@@ -39,11 +39,20 @@ namespace Restaurant.OrderHandlers
                     Console.WriteLine("Multiplexer delivering to {0}:{1}", handler.GetType().Name, typeof(T).Name);
 
                     var typedHandler = (IHandle<T>) handler;
-
-                    typedHandler.Handle(msg);
+                    typedHandler.Handle(msg);                    
                 }
             }
 
+            // publish to any handlers which subscribe to IMessage
+            List<IHandler> allMessageHandlers;
+            if (handlers.TryGetValue(typeof (IMessage), out allMessageHandlers))
+            {
+                foreach (var handler in allMessageHandlers)
+                {
+                    var typedHandler = (IHandle<IMessage>) handler;
+                    typedHandler.Handle(msg);
+                }
+            }
         }
     }
 }

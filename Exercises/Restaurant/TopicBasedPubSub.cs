@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using Restaurant.OrderHandlers;
 
 namespace Restaurant
@@ -33,6 +32,13 @@ namespace Restaurant
             if (subscriptions.TryGetValue(topic, out multiplexer))
             {
                 var typedMultiplexer = (Multiplexer)  multiplexer;
+                typedMultiplexer.Handle(message);
+            }
+
+            IMultiplexer messageMultiplexer;
+            if (subscriptions.TryGetValue("IMessage", out messageMultiplexer))
+            {
+                var typedMultiplexer = (Multiplexer) messageMultiplexer;
                 typedMultiplexer.Handle(message);
             }
         }
