@@ -30,7 +30,7 @@ namespace Restaurant.OrderHandlers
                 LiveUntil = liveUntil
             };
 
-            bus.Publish(new CookFood(order, Guid.Empty, correlationId, liveUntil));
+            bus.Publish(new OrderPlaced(order, Guid.Empty, correlationId, liveUntil));
             return order.OrderId;
         } 
     }

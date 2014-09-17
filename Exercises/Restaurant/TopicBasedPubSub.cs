@@ -28,9 +28,9 @@ namespace Restaurant
             Subscribe(handler, correlationId.ToString());
         }
 
-        public void Unsubscribe(IHandle<IMessage> handler, Guid correlationId)
+        public void UnsubscribeOnCorrelationId(Guid correlationId)
         {
-            throw new NotImplementedException();
+            subscriptions.Remove(correlationId.ToString());
         }
 
         public void Publish<T>(T message, string topic = null)
@@ -71,6 +71,6 @@ namespace Restaurant
     {
         void Subscribe<T>(IHandle<T> handler, string topic = null) where T : IMessage;
         void SusbcribeOnCorrelationId(IHandle<IMessage> handler, Guid correlationId);
-        void Unsubscribe(IHandle<IMessage> handler, Guid correlationId);
+        void UnsubscribeOnCorrelationId(Guid correlationId);
     }
 }

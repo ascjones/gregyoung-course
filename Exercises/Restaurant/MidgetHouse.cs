@@ -4,19 +4,22 @@ using Restaurant.OrderHandlers;
 
 namespace Restaurant
 {
-    public class MidgetHouse : IHandle<OrderPlaced>, IHandle<OrderCooked>, IHandle<OrderPriced>
+    public class MidgetHouse : IHandle<OrderPlaced>, IHandle<OrderCooked>, IHandle<OrderPriced>, IHandle<OrderPaid>
     {
         private readonly ITopicBasedPubSub bus;
-        private IDictionary<Guid, Midget> midgets = new Dictionary<Guid, Midget>();
+        private readonly MidgetFactory midgedFactory;
+        private readonly IDictionary<Guid, IMidget> midgets = new Dictionary<Guid, IMidget>();
 
-        public MidgetHouse(ITopicBasedPubSub bus)
+        public MidgetHouse(ITopicBasedPubSub bus, MidgetFactory midgedFactory)
         {
             this.bus = bus;
+            this.midgedFactory = midgedFactory;
 
             // todo: could wire this up using reflection
             bus.Subscribe<OrderPlaced>(this);
             bus.Subscribe<OrderCooked>(this);
             bus.Subscribe<OrderPriced>(this);
+            bus.Subscribe<OrderPaid>(this);
         }
 
         public void AddMidget(Midget midget)
@@ -26,6 +29,8 @@ namespace Restaurant
 
         public void Handle(OrderPlaced message)
         {
+            var midget = midgedFactory.CreateMidget(bus, message.CorrelationId);
+            midgets.Add(message.CorrelationId, midget);
             midgets[message.CorrelationId].Handle(message);
         }
 
@@ -38,51 +43,11 @@ namespace Restaurant
         {
             midgets[message.CorrelationId].Handle(message);
         }
-    }
 
-    public class MidgetFactory
-    {
-
-        public IMidget CreateMidget(ITopicBasedPubSub bus, Guid orderId)
+        public void Handle(OrderPaid message)
         {
-            return new Midget(bus, orderId);
+            midgets.Remove(message.CorrelationId);
         }
     }
 
-    public class Midget : IMidget
-    {
-        private readonly IMessagePublisher bus;
-        private readonly Guid orderId;
-
-        public Midget(IMessagePublisher bus, Guid orderId)
-        {
-            this.bus = bus;
-            this.orderId = orderId;
-        }
-
-        public Guid OrderId
-        {
-            get { return orderId; }
-        }
-
-        public void Handle(OrderPlaced message)
-        {
-            bus.Publish(new CookFood(message.Order, message.MessageId, message.CorrelationId, DateTime.UtcNow.AddSeconds(10)));
-        }
-
-        public void Handle(OrderCooked message)
-        {
-            bus.Publish(new PriceOrder(message.Order, message.MessageId, message.CorrelationId));
-        }
-
-        public void Handle(OrderPriced message)
-        {
-            bus.Publish(new TakePayment(message.Order, message.MessageId, message.CorrelationId));
-        }
-    }
-
-    public interface IMidget
-    {
-        void Handle(OrderPlaced message);
-    }
 }

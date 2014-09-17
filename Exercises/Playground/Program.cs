@@ -15,6 +15,9 @@ namespace Playground
             var bus = new TopicBasedPubSub();
             var messageListener = new MessageListener(bus);
             var startables = new List<IStartable>();
+            
+            var midgetFactory = new MidgetFactory();
+            var midgetHouse = new MidgetHouse(bus, midgetFactory);
 
             var consolePrinter = new QueuedHandler<OrderPaid>(Messages.Paid, new ConsolePrintingOrderHandler(bus));
             bus.Subscribe(consolePrinter);
@@ -51,10 +54,8 @@ namespace Playground
             monitor.Start();
 
             var waiter = new Waiter(bus);
-
-
-
-            for (int i = 0; i < 10; i++)
+            
+            for (int i = 0; i < 1; i++)
             {
                 var correlationId = Guid.NewGuid();
 
