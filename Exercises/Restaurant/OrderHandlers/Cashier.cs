@@ -7,7 +7,7 @@ namespace Restaurant.OrderHandlers
     public class Cashier : IHandle<TakePayment>, IStartable
     {
         private readonly ITopicBasedPubSub bus;
-        private readonly ConcurrentQueue<Order> orders = new ConcurrentQueue<Order>();
+        private readonly ConcurrentQueue<TakePayment> orders = new ConcurrentQueue<TakePayment>();
 
         public Cashier(ITopicBasedPubSub bus)
         {
@@ -16,18 +16,18 @@ namespace Restaurant.OrderHandlers
 
         public void Handle(TakePayment message)
         {
-            orders.Enqueue(message.Order);
+            orders.Enqueue(message);
         }
 
         public void HandleOutstandingPayments()
         {
             while (true)
             {
-                Order order;
-                while (orders.TryDequeue(out order))
+                TakePayment takePayment;
+                while (orders.TryDequeue(out takePayment))
                 {
-                    order.Paid = true;
-                    bus.Publish(new OrderPaid(order));
+                    takePayment.Order.Paid = true;
+                    bus.Publish(new OrderPaid(takePayment.Order, takePayment.MessageId, takePayment.CorrelationId));
                 }
                 Thread.Sleep(1);
             }       

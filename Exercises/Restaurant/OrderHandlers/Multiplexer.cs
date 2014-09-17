@@ -7,32 +7,43 @@ namespace Restaurant.OrderHandlers
     {
     }
 
-    public class Widener<TIn, TOut>
+    public class Multiplexer : IHandler, IMultiplexer
     {
-        
-    }
+        //private readonly IList<IHandle<T>> handlers;
+        //private readonly IList<Widener<TMessage, >> 
+        private readonly IDictionary<Type, List<IHandler>> handlers = new Dictionary<Type, List<IHandler>>();
 
-    public class Multiplexer<T> : IHandle<T>, IMultiplexer
-    {
-        private readonly IList<IHandle<T>> handlers;
+        //public Multiplexer(Dictionary<Type, IHandler> handlers)
+        //{
+        //    this.handlers = handlers;
+        //}
 
-        public Multiplexer(IEnumerable<IHandle<T>> handlers)
+        public void Add<T>(IHandle<T> handler)
         {
-            this.handlers = new List<IHandle<T>>(handlers);
-        }
-
-        public void Add(IHandle<T> handler)
-        {
-            handlers.Add(handler);
-        }
-
-        public void Handle(T msg)
-        {
-            foreach (var handler in handlers)
+            List<IHandler> existingHandlers;
+            if (!handlers.TryGetValue(typeof(T), out existingHandlers))
             {
-                Console.WriteLine("Multiplexer delivering to {0}:{1}", handler.GetType().Name, typeof(T).Name);
-                handler.Handle(msg);
+                existingHandlers = new List<IHandler>();
+                handlers.Add(typeof(T), existingHandlers);
             }
+            existingHandlers.Add(handler);
+        }
+
+        public void Handle<T>(T msg)
+        {
+            List<IHandler> messageHandlers;
+            if (handlers.TryGetValue(typeof(T), out messageHandlers))
+            {
+                foreach (var handler in messageHandlers)
+                {
+                    Console.WriteLine("Multiplexer delivering to {0}:{1}", handler.GetType().Name, typeof(T).Name);
+
+                    var typedHandler = (IHandle<T>) handler;
+
+                    typedHandler.Handle(msg);
+                }
+            }
+
         }
     }
 }

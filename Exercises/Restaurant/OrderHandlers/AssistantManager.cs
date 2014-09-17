@@ -35,7 +35,7 @@ namespace Restaurant.OrderHandlers
             order.Tax = tax;
             order.Total = subtotal + tax;
 
-            bus.Publish(new TakePayment(order));
+            bus.Publish(new TakePayment(order, message.MessageId, message.CorrelationId));
         }
     }
 }

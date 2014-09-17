@@ -28,7 +28,7 @@ namespace Restaurant
             var order = message.Order;
             order.Ingredients = order.Items.Select(i => ingredientDb[i.ItemName]).ToArray();
 
-            bus.Publish(new PriceOrder(order));
+            bus.Publish(new PriceOrder(order, message.MessageId, message.CorrelationId));
         }
     }
 }

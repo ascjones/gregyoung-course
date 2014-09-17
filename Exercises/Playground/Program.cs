@@ -11,7 +11,9 @@ namespace Playground
 
         static void Main()
         {
+
             var bus = new TopicBasedPubSub();
+            var messageListener = new MessageListener(bus);
             var startables = new List<IStartable>();
 
             var consolePrinter = new QueuedHandler<OrderPaid>(Messages.Paid, new ConsolePrintingOrderHandler(bus));

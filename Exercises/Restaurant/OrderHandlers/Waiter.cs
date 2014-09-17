@@ -15,6 +15,7 @@ namespace Restaurant.OrderHandlers
 
         public string PlaceOrder()
         {
+            DateTime liveUntil = DateTime.UtcNow.Add(TimeSpan.FromSeconds(10.0));
             var order = new Order
             {
                 OrderId = orderId++.ToString(CultureInfo.InvariantCulture),
@@ -26,9 +27,9 @@ namespace Restaurant.OrderHandlers
                     new OrderItem {ItemName = "Spaghetti Bolognese", Qty = 2},
                     new OrderItem {ItemName = "Fish", Qty = 3 },
                 },
-                LiveUntil = DateTime.UtcNow.Add(TimeSpan.FromSeconds(10.0))
+                LiveUntil = liveUntil
             };
-            bus.Publish(new CookFood(order));
+            bus.Publish(new CookFood(order, Guid.Empty, Guid.NewGuid(), liveUntil));
             return order.OrderId;
         } 
     }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Restaurant.OrderHandlers
 {
-    public class QueuedDispatcher<T> : IStartable, IHandle<T>
+    public class QueuedDispatcher<T> : IStartable, IHandle<T> where T : IMessage
     {
         private readonly ConcurrentQueue<T>  outerQueue = new ConcurrentQueue<T>();
         private readonly IEnumerable<QueuedHandler<T>> childHandlers;

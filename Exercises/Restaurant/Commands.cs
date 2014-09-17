@@ -2,45 +2,35 @@
 
 namespace Restaurant
 {
-    class Commands
+    public class CookFood : BaseEvent
     {
-    }
-
-    public class CookFood : IMessage
-    {
-        public CookFood(Order order)
+        public CookFood(Order order, Guid causationId, Guid correlationId, DateTime? timeToLive = null)
+            : base (causationId, correlationId, timeToLive)
         {
             Order = order;
         }
-
-        public Guid MessageId { get; private set; }
-        public DateTime? TimeToLive { get; private set; }
 
         public Order Order { get; set; }
     }
 
-    public class PriceOrder : IMessage
+    public class PriceOrder : BaseEvent
     {
-        public PriceOrder(Order order)
+        public PriceOrder(Order order, Guid causationId, Guid correlationId, DateTime? timeToLive = null)
+            : base(causationId, correlationId, timeToLive)
         {
             Order = order;
         }
-
-        public Guid MessageId { get; private set; }
-        public DateTime? TimeToLive { get; private set; }
 
         public Order Order { get; set; }
     }
 
-    public class TakePayment : IMessage
+    public class TakePayment : BaseEvent
     {
-        public TakePayment(Order order)
+        public TakePayment(Order order, Guid causationId, Guid correlationId, DateTime? timeToLive = null)
+            : base(causationId, correlationId, timeToLive)
         {
             Order = order;
         }
-
-        public Guid MessageId { get; private set; }
-        public DateTime? TimeToLive { get; private set; }
 
         public Order Order { get; set; }
     }
