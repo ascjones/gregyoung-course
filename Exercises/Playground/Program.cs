@@ -11,7 +11,6 @@ namespace Playground
 
         static void Main()
         {
-
             var bus = new TopicBasedPubSub();
             var messageListener = new MessageListener(bus);
             var startables = new List<IStartable>();
@@ -55,12 +54,9 @@ namespace Playground
 
             var waiter = new Waiter(bus);
             
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 10; i++)
             {
                 var correlationId = Guid.NewGuid();
-
-         //       if (i == 0)
-         //           bus.SusbcribeOnCorrelationId(messageListener, correlationId);
 
                 var orderId = waiter.PlaceOrder(correlationId);    
             }            

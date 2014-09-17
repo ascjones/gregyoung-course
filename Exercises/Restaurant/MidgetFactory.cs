@@ -7,7 +7,7 @@ namespace Restaurant
 
         public IMidget CreateMidget(ITopicBasedPubSub bus, Guid orderId)
         {
-            return new Midget(bus, orderId);
+            return new EnglishMidget(bus, orderId);
         }
     }
 }

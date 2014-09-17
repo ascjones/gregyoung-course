@@ -68,4 +68,15 @@ namespace Restaurant
         public Order Order { get; private set; }
     }
 
+    public class OrderComplete : BaseEvent
+    {
+        public OrderComplete(Order order, Guid causationId, Guid correlationId, DateTime? timeToLive = null)
+            : base(causationId, correlationId, timeToLive)
+        {
+            Order = order;
+        }
+
+        public Order Order { get; private set; }
+    }
+
 }

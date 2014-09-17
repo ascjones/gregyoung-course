@@ -36,7 +36,7 @@ namespace Restaurant.OrderHandlers
             {
                 foreach (var handler in messageHandlers)
                 {
-                    Console.WriteLine("Multiplexer delivering to {0}:{1}", handler.GetType().Name, typeof(T).Name);
+               //     Console.WriteLine("Multiplexer delivering to {0}:{1}", handler.GetType().Name, typeof(T).Name);
 
                     var typedHandler = (IHandle<T>) handler;
                     typedHandler.Handle(msg);                    

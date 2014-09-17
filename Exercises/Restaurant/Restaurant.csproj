@@ -44,7 +44,7 @@
   <ItemGroup>
     <Compile Include="Commands.cs" />
     <Compile Include="Events.cs" />
-    <Compile Include="Midget.cs" />
+    <Compile Include="EnglishMidget.cs" />
     <Compile Include="MidgetFactory.cs" />
     <Compile Include="MidgetHouse.cs" />
     <Compile Include="OrderHandlers\Cashier.cs" />

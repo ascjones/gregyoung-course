@@ -4,7 +4,7 @@ using Restaurant.OrderHandlers;
 
 namespace Restaurant
 {
-    public class MidgetHouse : IHandle<OrderPlaced>, IHandle<OrderCooked>, IHandle<OrderPriced>, IHandle<OrderPaid>
+    public class MidgetHouse : IHandle<OrderPlaced>, IHandle<OrderCooked>, IHandle<OrderPriced>, IHandle<OrderPaid>, IHandle<OrderComplete>
     {
         private readonly ITopicBasedPubSub bus;
         private readonly MidgetFactory midgedFactory;
@@ -20,11 +20,12 @@ namespace Restaurant
             bus.Subscribe<OrderCooked>(this);
             bus.Subscribe<OrderPriced>(this);
             bus.Subscribe<OrderPaid>(this);
+            bus.Subscribe<OrderComplete>(this);
         }
 
-        public void AddMidget(Midget midget)
+        public void AddMidget(EnglishMidget englishMidget)
         {
-            midgets.Add(midget.OrderId, midget);
+            midgets.Add(englishMidget.OrderId, englishMidget);
         }
 
         public void Handle(OrderPlaced message)
@@ -46,8 +47,13 @@ namespace Restaurant
 
         public void Handle(OrderPaid message)
         {
+            midgets[message.CorrelationId].Handle(message);
+        }
+
+        public void Handle(OrderComplete message)
+        {
             midgets.Remove(message.CorrelationId);
+            Console.WriteLine("Order Complete: {0}", message.CorrelationId);
         }
     }
-
 }

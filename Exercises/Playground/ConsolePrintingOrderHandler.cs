@@ -15,7 +15,7 @@ namespace Playground
 
         public void Handle(OrderPaid message)
         {
-        //    Console.WriteLine(message.Order.Serialize().ToString());
+            Console.WriteLine("Order Paid: {0}", message.CorrelationId);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Restaurant
 
         public void Subscribe<T>(IHandle<T> handler, string topic = null) where T : IMessage
         {
-            Console.WriteLine("Subscribing to {0}", typeof(T).Name);
+           // Console.WriteLine("Subscribing to {0}", typeof(T).Name);
             IMultiplexer multiplexer;
 
             topic = topic ?? typeof (T).Name;
@@ -36,7 +36,7 @@ namespace Restaurant
         public void Publish<T>(T message, string topic = null)
             where T : IMessage
         {
-            Console.WriteLine("Publishing to {0}", typeof(T).Name);
+        //    Console.WriteLine("Publishing to {0}", typeof(T).Name);
             topic = topic ?? typeof(T).Name;
             IMultiplexer multiplexer;
             if (subscriptions.TryGetValue(topic, out multiplexer))

@@ -41,7 +41,7 @@ namespace Restaurant.Tests
            
             var orderPlaced = new OrderPlaced(order, Guid.NewGuid(), orderGuid);
 
-            var midget = new Midget(bus, orderGuid);
+            var midget = new EnglishMidget(bus, orderGuid);
             midget.Handle(orderPlaced);
 
             //var cookFood = (CookFood) bus.Messages.Single();
@@ -53,7 +53,7 @@ namespace Restaurant.Tests
         {
             var orderCooked = new OrderCooked(order, Guid.NewGuid(), orderGuid);
 
-            var midget = new Midget(bus, orderGuid);
+            var midget = new EnglishMidget(bus, orderGuid);
             midget.Handle(orderCooked);
 
             //var cookFood = (CookFood) bus.Messages.Single();
@@ -66,7 +66,7 @@ namespace Restaurant.Tests
         {
             var orderPriced = new OrderPriced(order, Guid.NewGuid(), orderGuid);
 
-            var midget = new Midget(bus, orderGuid);
+            var midget = new EnglishMidget(bus, orderGuid);
             midget.Handle(orderPriced);
 
             Assert.That(bus.Messages.Single(), Is.InstanceOf<TakePayment>());
