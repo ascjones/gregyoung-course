@@ -2,7 +2,7 @@
 
 namespace Restaurant.OrderHandlers
 {
-    public class AssistantManager : IHandle<OrderCooked>
+    public class AssistantManager : IHandle<PriceOrder>
     {
         private readonly ITopicBasedPubSub bus;
         private const decimal TaxRate = 0.2M;
@@ -18,7 +18,7 @@ namespace Restaurant.OrderHandlers
             this.bus = bus;
         }
 
-        public void Handle(OrderCooked message)
+        public void Handle(PriceOrder message)
         {
             var order = message.Order;
             decimal subtotal = 0M;
@@ -35,7 +35,7 @@ namespace Restaurant.OrderHandlers
             order.Tax = tax;
             order.Total = subtotal + tax;
 
-            bus.Publish(new OrderPriced(order));
+            bus.Publish(new TakePayment(order));
         }
     }
 }

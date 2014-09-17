@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Restaurant.OrderHandlers
 {
-    public class Cashier : IHandle<OrderPriced>, IStartable
+    public class Cashier : IHandle<TakePayment>, IStartable
     {
         private readonly ITopicBasedPubSub bus;
         private readonly ConcurrentQueue<Order> orders = new ConcurrentQueue<Order>();
@@ -14,7 +14,7 @@ namespace Restaurant.OrderHandlers
             this.bus = bus;
         }
 
-        public void Handle(OrderPriced message)
+        public void Handle(TakePayment message)
         {
             orders.Enqueue(message.Order);
         }

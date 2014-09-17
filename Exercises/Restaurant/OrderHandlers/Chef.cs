@@ -5,7 +5,7 @@ using Restaurant.OrderHandlers;
 
 namespace Restaurant
 {
-    public class Chef : IHandle<OrderPlaced>
+    public class Chef : IHandle<CookFood>
     {
         private readonly ITopicBasedPubSub bus;
         private readonly int timeToCook;
@@ -22,13 +22,13 @@ namespace Restaurant
             {"Fish", "Cod, Chips, Mushy Peas"},
         };
 
-        public void Handle(OrderPlaced message)
+        public void Handle(CookFood message)
         {
             Thread.Sleep(timeToCook);
             var order = message.Order;
             order.Ingredients = order.Items.Select(i => ingredientDb[i.ItemName]).ToArray();
 
-            bus.Publish(new OrderCooked(order));
+            bus.Publish(new PriceOrder(order));
         }
     }
 }

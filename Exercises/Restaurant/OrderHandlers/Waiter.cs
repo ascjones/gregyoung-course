@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Restaurant
+namespace Restaurant.OrderHandlers
 {
     public class Waiter
     {
@@ -28,7 +28,7 @@ namespace Restaurant
                 },
                 LiveUntil = DateTime.UtcNow.Add(TimeSpan.FromSeconds(10.0))
             };
-            bus.Publish(new OrderPlaced(order));
+            bus.Publish(new CookFood(order));
             return order.OrderId;
         } 
     }

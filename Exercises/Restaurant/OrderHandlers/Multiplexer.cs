@@ -12,7 +12,7 @@ namespace Restaurant.OrderHandlers
         
     }
 
-    public class Multiplexer : IHandle<T>, IMultiplexer
+    public class Multiplexer<T> : IHandle<T>, IMultiplexer
     {
         private readonly IList<IHandle<T>> handlers;
 
